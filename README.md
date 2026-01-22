@@ -4,6 +4,26 @@ Este microservicio es un **Worker de Notificaciones** construido con [NestJS](ht
 
 Funciona de manera asíncrona y se comunica vía **TCP** bajo una arquitectura orientada a eventos.
 
+---
+
+## 🛡️ Seguridad y Protección
+
+La seguridad es un componente fundamental de este microservicio. Se implementan las siguientes medidas para garantizar la integridad y confidencialidad de los datos:
+
+- **Validación de Token Secreto (`INTERNAL_SECRET`):**
+  - Todas las solicitudes recibidas deben incluir un token secreto que debe coincidir exactamente con el valor configurado en el archivo `.env` (`INTERNAL_SECRET`).
+  - Si el token no coincide, la solicitud es automáticamente rechazada y no se procesa ningún dato.
+  - Este mecanismo previene accesos no autorizados y protege el servicio de intentos de uso indebido.
+
+- **Comunicación TCP Segura:**
+  - El microservicio solo responde a eventos que cumplan con el patrón y el token de seguridad.
+
+- **Protección de Credenciales SMTP:**
+  - Las credenciales de correo (usuario y contraseña SMTP) nunca deben compartirse ni subirse a repositorios públicos.
+  - Se recomienda el uso de contraseñas de aplicación para servicios como Gmail.
+
+> **IMPORTANTE:** Mantén el valor de `INTERNAL_SECRET` en secreto y cámbialo periódicamente para reforzar la seguridad.
+
 ## Funcionalidades
 
 * **Escucha TCP:** Recibe eventos bajo el patrón `vote.confirmed`.
@@ -11,7 +31,6 @@ Funciona de manera asíncrona y se comunica vía **TCP** bajo una arquitectura o
 * **Generación PDF:** Crea documentos PDF al vuelo con fecha y hora de emisión dinámica.
 * **Envío de Correo:** Utiliza SMTP (Gmail/Outlook) para enviar el certificado como adjunto.
 
----
 
 ## Instalación
 
@@ -49,9 +68,10 @@ SMTP_USER=tu_correo@gmail.com
 SMTP_PASS=tu_password_de_aplicacion_16_letras
 ```
 
+> **Recomendación de Seguridad:** Nunca compartas ni subas tu archivo `.env` a repositorios públicos. Usa variables de entorno seguras en producción.
+
 > **Nota sobre SMTP:** Si usas el puerto **587**, el sistema utiliza `secure: false` (STARTTLS). Si usas el puerto **465**, el código debería ajustarse a `secure: true`.
 
----
 
 ## Ejecución
 
@@ -90,6 +110,8 @@ El objeto de datos (`data`) enviado en el evento debe tener esta estructura:
   "email": "juan.perez@email.com"
 }
 ```
+
+> **Validación de Seguridad:** El campo `token` es obligatorio y debe coincidir con el valor de `INTERNAL_SECRET` configurado en el servicio. Si no coincide, la solicitud será ignorada.
 
 * **token**: *String (Obligatorio)*. Si no coincide con el `.env`, la solicitud es ignorada.
 * **email**: *String (Obligatorio)*. Dirección de destino.
